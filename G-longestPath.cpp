@@ -1,4 +1,20 @@
-#include<bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cstring>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <cmath>
+#include <functional>
+#include <deque>
+#include <bitset>
+#include <climits>
+#include <cstdio>
+#include <list>
+#include <iomanip>
 using namespace std;
 
 #define ll long long int
@@ -17,56 +33,37 @@ using namespace std;
 #define PNF1(a,n,m) for(int i=1;i<=n;i++){for(int j=1;j<=m;j++){cout<<a[i][j]<<' ';}cout<<endl;}cout<<endl;
 #define AS 200001
 #define mod 1000000007
-string lcs(string a, string b) {
-	int n = a.size();
-	int m = b.size();
-	int dp[n + 1][m + 1];
-	for (int i = 0; i < n + 1; i++) {
-		for (int j = 0; j < m + 1; j++) {
-			if (i == 0 || j == 0) {
-				dp[i][j] = 0;
-			}
-		}
+vector<int>graph[100001];
+int dp[100001]; //dp[i] =len of longest path starting at node i
+int solve(int src) {
+	if (dp[src] != -1) {
+		return dp[src];
 	}
-	for (int i = 1; i < n + 1; i++) {
-		for (int j = 1; j < m + 1; j++) {
-			if (a[i - 1] == b[j - 1]) {
-				dp[i][j] = 1 + dp[i - 1][j - 1];
-			}
-			else {
-				dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
-			}
-		}
+	bool leaf = 1;
+	int bestChild = 0;
+	for (int child : graph[src]) {
+		leaf = 0;
+		bestChild = max(solve(child), bestChild);
 	}
-	int i = n;
-	int j = m;
-	string ans = "";
-	while (i > 0 and j > 0) {
-		if (a[i - 1] == b[j - 1]) {
-			ans.push_back(a[i - 1]);
-			i--;
-			j--;
-		}
-		else {
-			if (dp[i][j - 1] > dp[i - 1][j]) {
-				j--;
-			}
-			else {
-				i--;
-			}
-		}
-	}
-	reverse(ans.begin(), ans.end());
-	return ans;
+	return dp[src] = leaf ? 0 : 1 + bestChild;
 }
-
 int main() {
 	fastIO
-#ifndef ONLINE_JUDGEṭ
+#ifndef ONLINE_JUDGE
 	freopen("input.txt", "r", stdin);
 	freopen("output.txt", "w", stdout);
 #endif
-	string a, b;
-	cin >> a >> b;
-	cout << lcs(a, b);
+	int n, m;
+	cin >> n >> m;
+	memset(dp, -1, sizeof dp);
+	for (int i = 0; i < m; i++) {
+		int u, v;
+		cin >> u >> v;
+		graph[u].push_back(v);
+	}
+	int ans = 0;
+	for (int i = 1; i <= n; i++ ) {
+		ans = max(ans, solve(i));
+	}
+	cout << ans << endl;
 }

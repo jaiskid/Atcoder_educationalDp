@@ -1,4 +1,20 @@
-#include<bits/stdc++.h>
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <cstring>
+#include <map>
+#include <set>
+#include <unordered_map>
+#include <queue>
+#include <stack>
+#include <cmath>
+#include <functional>
+#include <deque>
+#include <bitset>
+#include <climits>
+#include <cstdio>
+#include <list>
+#include <iomanip>
 using namespace std;
 
 #define ll long long int
@@ -17,22 +33,20 @@ using namespace std;
 #define PNF1(a,n,m) for(int i=1;i<=n;i++){for(int j=1;j<=m;j++){cout<<a[i][j]<<' ';}cout<<endl;}cout<<endl;
 #define AS 200001
 #define mod 1000000007
-bool DONE(vector<int>&v , int n) {
-	for (int i = 1; i <= n; i++) {
-		if (v[i] != 0)
-			return 0;
+int solve(vector<int>&v, int n, int k) {
+	ll dp[n + 2][k + 2];
+	for (int j = 0; j <= k; j++) {
+		dp[1][j] = (j > v[1]) ? 0 : 1;
 	}
-	return 1;
-}
-int experiment(vector<int>&v, int n) {
-	if (DONE(v, n)) {
-		return 0;
+	for (int i = 2; i <= n; i++) {
+		for (int j = 0; j <= k; j++) {
+			if (j == 0)
+				dp[i][j] = dp[i - 1][j];
+			else
+				dp[i][j] = (mod + dp[i][j - 1] + dp[i - 1][j] - ((j - v[i] - 1 >= 0) ? dp[i - 1][j - v[i] - 1] : 0)) % mod;
+		}
 	}
-	else {
-		int dish = (rand() % n) + 1;
-		v[dish] = max(0, v[dish] - 1);
-		return 1 + experiment(v, n);
-	}
+	return dp[n][k];
 }
 int main() {
 	fastIO
@@ -40,19 +54,9 @@ int main() {
 	freopen("input.txt", "r", stdin);
 	freopen("output.txt", "w", stdout);
 #endif
-	int n;
-	cin >> n;
-	vector<int>dishes, temp;
-	dishes.resize(n + 1);
-	temp.resize(n + 1);
-	F1(dishes, n);
-	temp = dishes;
-	double total_ops = 0;
-	int conduct_exp = 1000000;
-	for (int i = 1; i <= conduct_exp; i++) { 
-		total_ops += experiment(dishes, n);
-		dishes = temp;
-	}
-	cout  << total_ops / conduct_exp << endl;
-	return 0;
+	int  n, k;
+	cin >> n >> k;
+	vector<int>v(n + 1);
+	F1(v, n);
+	cout << solve(v, n, k);
 }
